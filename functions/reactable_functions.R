@@ -15,16 +15,7 @@ rt_specific_col_def <- function() {
       minWidth = 150,
       style = list(position = "sticky", left = 100, background = "#fff", zIndex = 1),
       headerStyle = list(position = "sticky", left = 100, background = "#fff", zIndex = 1)
-                         )#,
-    # Trendline = colDef(
-    #   sortable = F,
-    #   align = 'left',
-    #   style = list(position = "sticky", left = 250, background = "#fff", zIndex = 1),
-    #   headerStyle = list(position = "sticky", left = 250, background = "#fff", zIndex = 1),
-    #   cell = function(values) {
-    #     sparkline(values, type = "bar")
-    #   }
-    # )
+                         )
   )
 }
 
@@ -33,9 +24,11 @@ make_color_pal <- function(colors, bias = 1) {
   function(x) rgb(get_color(x), maxColorValue = 255)
 }
 
-top_ten_color <- make_color_pal(c("#ffe4b2","#ffc966", "#e59400"), bias = 5)
+# colors are of an orange palette
+top_ten_color <- make_color_pal(c("#ffe4b2","#ffc966", "#e59400"), bias = 5) 
 
 rt_default_col_def <- function(table, format_type, add_style_top_ten = F) {
+  # define default columns' formatting and style
   if (format_type == "number") {
     frmt <- colFormat(separators = T)
   } else if (format_type == "percent") {
@@ -54,6 +47,8 @@ rt_default_col_def <- function(table, format_type, add_style_top_ten = F) {
                     }
                     
                     if (is.numeric(value) && value != 0 && value %in% x) {
+                      # add class 'sub-cell' to cells where value is amongst the top-ten for the column
+                      # apply color scale for class 'sub-cell'
                       normalized <- (value - min(x)) / (max(x) - min(x))
                       color <- top_ten_color(normalized)
                       div(class = "sub-cell", style = list(background = color), frmt)

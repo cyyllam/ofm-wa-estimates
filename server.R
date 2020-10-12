@@ -17,17 +17,20 @@ server <- function(input, output, session) {
   filter_data <- reactive({
     years <- input$tablr_year
     id_cols <- c("Filter", "County", "Jurisdiction")
-
+    
+    # filter by dataset and year(s)
     d <- df %>% 
       arrange(year) %>% 
       filter(attr == input$tablr_attr,
              year %in% seq(min(years), max(years))) 
 
     if (input$tablr_juris %in% c(1:4)) {
+      # filter by selected jurisdiction
       d <- d %>% filter(Filter == input$tablr_juris)
     }
     
     if (input$tablr_juris %in% c(4, 5) & input$tablr_city_combine) {
+      # aggregate and sum multipart cities
       d_part_a <- d %>% filter(Jurisdiction %in% str_subset(Jurisdiction, "(part)"))
 
       suppressWarnings(d_part_b <- d %>% 
@@ -48,6 +51,7 @@ server <- function(input, output, session) {
     }
     
     if (!is.null(input$tablr_county)) {
+      # filter by county, accounting for cities that are multi-county
       if (input$tablr_county %in% "King") {
         cnty_filter <- c("King", "King-Pierce", "King-Snohomish")
       } else if (input$tablr_county == "Pierce") {
@@ -57,7 +61,8 @@ server <- function(input, output, session) {
       }
         d <- d %>% filter(County %in% input$tablr_county)
     }
-
+    
+    # calculate change if necessary and pivot data
     if (input$tablr_report_type == "Total") {
       t <- d %>% 
         pivot_wider(id_cols = all_of(id_cols),
@@ -78,13 +83,9 @@ server <- function(input, output, session) {
         ungroup()%>% 
         mutate(across(where(is.numeric), function(x) ifelse(is.infinite(x), 0, x)))
     }
-    
-    # create list column Trendline for sparkline htmlwidget
-    # t <- t %>% 
-    #   mutate(Trendline = pmap(unname(.[,str_subset(colnames(.), "\\d{4}")]), list)) %>% 
-    #   select(all_of(id_cols), Trendline, everything())
 
     if (!(input$tablr_juris %in% c(4, 5)) & (nrow(t) > 0)) {
+      # footer name for county summaries
       footer_name <- switch(input$tablr_juris, 
                             "1"= "Region", 
                             "2" = "Unincorporated Region",
@@ -95,8 +96,6 @@ server <- function(input, output, session) {
       sum_cols <- str_subset(colnames(t), "\\d{4}")
       b <- t %>% 
         summarise(across(all_of(sum_cols), sum)) %>% 
-        # if summary line includes Trendline
-        # mutate(Trendline = pmap(unname(.[,str_subset(colnames(.), "\\d{4}")]), list), Jurisdiction = footer_name)
         mutate(Jurisdiction = footer_name)
       t <- bind_rows(t, b)
     }
@@ -108,6 +107,8 @@ server <- function(input, output, session) {
 
   
   output$ui_tablr_main_table <- renderUI({
+    # display notes relating to data availability and table styling for cities
+    
     display_note <- "Estimates other than Total Population are not yet available for years after 2010."
     cities_note <- "Circles denote cities that rank in the top ten of filtered results with 
     hue progressing from dark to light when sorted in decending order for a given year."
@@ -167,27 +168,27 @@ server <- function(input, output, session) {
       cols <- c(cols[1], str_subset(colnames(t), "\\-"))
     }
     
+    # change numeric formatting or cell style depending on selection
     if (input$tablr_juris == 4) {
+      
       if (input$tablr_report_type == "Delta Percent") {
         def_col_form <- rt_default_col_def(t, "percent", add_style_top_ten = T)
       } else {
         def_col_form <- rt_default_col_def(t, "number", add_style_top_ten = T)
       }
+      
     } else {
+      
       if (input$tablr_report_type == "Delta Percent") {
         def_col_form <- rt_default_col_def(t, "percent")
       } else {
         def_col_form <- rt_default_col_def(t, "number")
       }
+      
     }
     
-    # If Trendline col is included
-    # if (input$tablr_report_type != "Total" & (ncol(t) > 4)) {
-    #   t <- t %>% select(everything(), -c(4))
-    #   cols <- cols[2:length(cols)]
-    # } 
-    
     if (input$tablr_report_type != "Total" & (ncol(t) > 3)) {
+      # remove base column used for calculating change
       t <- t %>% select(everything(), -c(3))
       cols <- cols[2:length(cols)]
     }
