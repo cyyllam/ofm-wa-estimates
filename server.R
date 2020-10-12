@@ -52,14 +52,23 @@ server <- function(input, output, session) {
     
     if (!is.null(input$tablr_county)) {
       # filter by county, accounting for cities that are multi-county
-      if (input$tablr_county %in% "King") {
-        cnty_filter <- c("King", "King-Pierce", "King-Snohomish")
-      } else if (input$tablr_county == "Pierce") {
-        cnty_filter <- c("Pierce", "King-Pierce")
-      } else if (input$tablr_county == "Snohomish") {
-        cnty_filter <- c("Snohomish", "King-Snohomish")
-      }
+      
+      if (input$tablr_county != "Kitsap") {
+        
+        if (input$tablr_county %in% "King") {
+          cnty_filter <- c("King", "King-Pierce", "King-Snohomish")
+        } else if (input$tablr_county == "Pierce") {
+          cnty_filter <- c("Pierce", "King-Pierce")
+        } else if (input$tablr_county == "Snohomish") {
+          cnty_filter <- c("Snohomish", "King-Snohomish")
+        }
+        d <- d %>% filter(County %in% cnty_filter)
+        
+      } else {
+        
         d <- d %>% filter(County %in% input$tablr_county)
+        
+      }
     }
     
     # calculate change if necessary and pivot data
