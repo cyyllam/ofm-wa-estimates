@@ -1,0 +1,55 @@
+nav {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+.navbar .navbar-nav {
+  float: right
+}
+
+.navbar .container-fluid {
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+.main {
+  margin: 2rem auto auto auto;  
+}
+
+.intro-container {
+  padding: 5rem;
+}
+
+.intro {
+  font-size: 1.5rem;
+  padding: 1rem 15rem;
+}
+
+.note-container {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+}
+  
+.note {
+  text-align: center;
+}
+
+.long-note {
+  text-align: left;
+}
+
+.sub-cell {
+  /*font-weight: 700;*/
+  margin: auto 20%;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  border-radius: 50%;
+}
+
+
+
