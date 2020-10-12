@@ -1,6 +1,6 @@
 server <- function(input, output, session) {
   observeEvent(!(input$tablr_juris %in% c(4,5)), {
-    # clear county checkboxes if user clicks on the county related summaries
+    # clear all checkboxes if user clicks on the county related summaries
     updateCheckboxGroupInput(session, 
                              "tablr_county",  
                              choices = list("King" = "King",
@@ -80,11 +80,10 @@ server <- function(input, output, session) {
     }
     
     # create list column Trendline for sparkline htmlwidget
-    t <- t %>% 
-      mutate(Trendline = pmap(unname(.[str_subset(colnames(.), "\\d{4}")]), list) %>% 
-               map(~setNames(.x, as.character(.x)))) %>% 
-      select(all_of(id_cols), Trendline, everything())
-# browser()
+    # t <- t %>% 
+    #   mutate(Trendline = pmap(unname(.[,str_subset(colnames(.), "\\d{4}")]), list)) %>% 
+    #   select(all_of(id_cols), Trendline, everything())
+
     if (!(input$tablr_juris %in% c(4, 5)) & (nrow(t) > 0)) {
       footer_name <- switch(input$tablr_juris, 
                             "1"= "Region", 
@@ -96,8 +95,9 @@ server <- function(input, output, session) {
       sum_cols <- str_subset(colnames(t), "\\d{4}")
       b <- t %>% 
         summarise(across(all_of(sum_cols), sum)) %>% 
-        mutate(Trendline = pmap(unname(.[str_subset(colnames(.), "\\d{4}")]), list),
-               Jurisdiction = footer_name)
+        # if summary line includes Trendline
+        # mutate(Trendline = pmap(unname(.[,str_subset(colnames(.), "\\d{4}")]), list), Jurisdiction = footer_name)
+        mutate(Jurisdiction = footer_name)
       t <- bind_rows(t, b)
     }
     
@@ -157,9 +157,9 @@ server <- function(input, output, session) {
     
     t <- filter_data() %>% 
       select(!Filter)
-    # if (input$tablr_attr == "GQ Population") {browser()}
+
     cols <- str_subset(colnames(t), "\\d{4}")
-    # browser()
+
     if (input$tablr_report_type %in% c("Delta", "Delta Percent")) {
       # # re-name column headers
       new_cols_name <- create_annual_delta_headers(t) 
@@ -181,8 +181,14 @@ server <- function(input, output, session) {
       }
     }
     
-    if (input$tablr_report_type != "Total" & (ncol(t) > 4)) {
-      t <- t %>% select(everything(), -c(4))
+    # If Trendline col is included
+    # if (input$tablr_report_type != "Total" & (ncol(t) > 4)) {
+    #   t <- t %>% select(everything(), -c(4))
+    #   cols <- cols[2:length(cols)]
+    # } 
+    
+    if (input$tablr_report_type != "Total" & (ncol(t) > 3)) {
+      t <- t %>% select(everything(), -c(3))
       cols <- cols[2:length(cols)]
     }
 

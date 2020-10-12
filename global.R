@@ -11,6 +11,5 @@ df <- bind_inter_post_censal_data(post_censal_file, inter_censal_files)
 
 # source tab files
 tab_files <- list.files(path = "tabs", full.names = T, recursive = T)
-tab_files <- tab_files[-grep(x = tab_files, pattern = "server")] # removes those in server dir
 
 suppressMessages(lapply(tab_files, source))

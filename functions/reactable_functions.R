@@ -15,16 +15,16 @@ rt_specific_col_def <- function() {
       minWidth = 150,
       style = list(position = "sticky", left = 100, background = "#fff", zIndex = 1),
       headerStyle = list(position = "sticky", left = 100, background = "#fff", zIndex = 1)
-                         ),
-    Trendline = colDef(
-      sortable = F,
-      align = 'left',
-      style = list(position = "sticky", left = 250, background = "#fff", zIndex = 1),
-      headerStyle = list(position = "sticky", left = 250, background = "#fff", zIndex = 1),
-      cell = function(values) {
-        sparkline(values, type = "bar")
-      }
-    )
+                         )#,
+    # Trendline = colDef(
+    #   sortable = F,
+    #   align = 'left',
+    #   style = list(position = "sticky", left = 250, background = "#fff", zIndex = 1),
+    #   headerStyle = list(position = "sticky", left = 250, background = "#fff", zIndex = 1),
+    #   cell = function(values) {
+    #     sparkline(values, type = "bar")
+    #   }
+    # )
   )
 }
 
