@@ -1,5 +1,5 @@
 # OFM Estimates for the Central Puget Sound Region
-This is a Shiny app to interact with April 1 Demographic Estimates from the Office of Financial Management (OFM) for the Central Puget Sound Region in Washington State. Estimates are sourced from intercensal (2000-2010) and postcensal (2011-2020) datasets and include the following:  
+This is a Shiny app to interact with [April 1 Demographic Estimates from the Office of Financial Management (OFM)](https://www.ofm.wa.gov/washington-data-research/population-demographics/population-estimates/april-1-official-population-estimates) for the Central Puget Sound Region in Washington State. Estimates are sourced from intercensal (2000-2010) and postcensal (2011-2020) datasets and include the following:  
 
 * Total Population
 * Household Population 
