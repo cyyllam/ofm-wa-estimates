@@ -58,12 +58,6 @@ compile_intercensal_data <- function(filename) {
   all_data <- map(sheets, clean_data) %>% reduce(bind_rows)
 }
 
-bind_inter_post_censal_data <- function(post_censal_file, inter_censal_files) {
-  bind_rows(
-    compile_postcensal_data(post_censal_file), compile_intercensal_data(inter_censal_files)
-  )
-}
-
 
 calc_delta <- function(table) {
   # calculate delta of estimate years from a compiled table

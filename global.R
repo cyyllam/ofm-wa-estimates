@@ -1,15 +1,15 @@
 library(shiny)
+library(bslib)
+library(RSQLite)
 
 source_files <- list.files(path = "functions", full.names = T, recursive = T)
 suppressMessages(lapply(source_files, source))
 
 # generate data
-post_censal_file <-"ofm_april1_population_final.xlsx"
-inter_censal_files <- "ofm_april1_intercensal_estimates_2000-2010.xlsx"
+conn <- dbConnect(SQLite(), "data/data.sqlite")
+df <- dbReadTable(conn, 'ofm_estimates')
 
-df <- bind_inter_post_censal_data(post_censal_file, inter_censal_files)
+# run all files in the modules sub-directory
+module_files <- list.files('modules', full.names = TRUE)
+sapply(module_files, source)
 
-# source tab files
-tab_files <- list.files(path = "tabs", full.names = T, recursive = T)
-
-suppressMessages(lapply(tab_files, source))
