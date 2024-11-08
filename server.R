@@ -14,7 +14,7 @@ server <- function(input, output, session) {
                         "city_combine",
                         value = F)
   })
-  
+    
   table_server(id = "tbl", 
                year = reactive(input$`sidebar-year`), 
                attribute = reactive(input$`sidebar-attr`), 

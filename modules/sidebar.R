@@ -16,12 +16,14 @@ sidebar_ui <- function(id) {
                       "Dataset", 
                       choices = attr_list,
                       selected = "Total Population"),
+          
           radioButtons(ns("report_type"),
                        "Report Type",
                        choices = list("Total" = "Total", 
                                       "Annual Change" = "Delta",
                                       "Annual Change (%)" = "Delta Percent"), 
                        selected = "Total"),
+          
           radioButtons(ns("juris"),
                        "Jurisdiction",
                        choices = list("All" = 5,
@@ -30,18 +32,21 @@ sidebar_ui <- function(id) {
                                       "Incorporated Only" = 3,
                                       "Cities Only" = 4),
                        selected = 1),
-          conditionalPanel("input.juris == 4 | input.juris == 5",
+          
+          conditionalPanel(condition = "input.juris == 4 | input.juris == 5",
                            checkboxInput(ns("city_combine"),
-                                         "Aggregate multi-county cities")),
-          conditionalPanel("input.juris == 5 | input.juris == 4",
+                                         "Aggregate multi-county cities"),
+                           ns=NS(id)),
+          conditionalPanel(condition = "input.juris == 5 | input.juris == 4",
                            checkboxGroupInput(ns("county"),
                                               "County",
                                               choices = list("King" = "King",
                                                              "Kitsap" = "Kitsap",
                                                              "Pierce" = "Pierce",
                                                              "Snohomish" = "Snohomish")
-                           )
-          ),
+                           ),
+                           ns=NS(id)),
+          
           sliderInput(ns("year"), 
                       "Years",
                       min = as.numeric(min(years)), 

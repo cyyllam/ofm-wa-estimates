@@ -17,7 +17,7 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
     filter_data <- reactive({
       years <- year()
       id_cols <- c("Filter", "County", "Jurisdiction")
-      
+
       # filter by dataset and year(s)
       d <- df %>% 
         arrange(year) %>% 
