@@ -15,21 +15,21 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
     ns <- session$ns
     
     filter_data <- reactive({
-      years <- year
+      years <- year()
       id_cols <- c("Filter", "County", "Jurisdiction")
       
       # filter by dataset and year(s)
       d <- df %>% 
         arrange(year) %>% 
-        filter(attr == attribute,
+        filter(attr == attribute(),
                year %in% seq(min(years), max(years))) 
       
-      if (jurisdiction %in% c(1:4)) {
+      if (jurisdiction() %in% c(1:4)) {
         # filter by selected jurisdiction
-        d <- d %>% filter(Filter == jurisdiction)
+        d <- d %>% filter(Filter == jurisdiction())
       }
       
-      if (jurisdiction %in% c(4, 5) & city_combine) {
+      if (jurisdiction() %in% c(4, 5) & city_combine()) {
         # aggregate and sum multipart cities
         d_part_a <- d %>% filter(Jurisdiction %in% str_subset(Jurisdiction, "(part)"))
         
@@ -50,33 +50,33 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
           arrange(Jurisdiction, County)
       }
       
-      if (!is.null(county)) {
+      if (!is.null(county())) {
         # filter by county, accounting for cities that are multi-county
         
-        if (county != "Kitsap") {
+        if (county() != "Kitsap") {
           
-          if (county %in% "King") {
+          if (county() %in% "King") {
             cnty_filter <- c("King", "King-Pierce", "King-Snohomish")
-          } else if (county == "Pierce") {
+          } else if (county() == "Pierce") {
             cnty_filter <- c("Pierce", "King-Pierce")
-          } else if (county == "Snohomish") {
+          } else if (county() == "Snohomish") {
             cnty_filter <- c("Snohomish", "King-Snohomish")
           }
           d <- d %>% filter(County %in% cnty_filter)
           
         } else {
           
-          d <- d %>% filter(County %in% county)
+          d <- d %>% filter(County %in% county())
           
         }
       }
       
       # calculate change if necessary and pivot data
-      if (report_type == "Total") {
+      if (report_type() == "Total") {
         t <- d %>% 
           pivot_wider(id_cols = all_of(id_cols),
                       names_from = year)
-      } else if (report_type == "Delta"){
+      } else if (report_type() == "Delta"){
         t <- d %>% 
           calc_delta() %>% 
           pivot_wider(id_cols = all_of(id_cols),
@@ -93,9 +93,9 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
           mutate(across(where(is.numeric), function(x) ifelse(is.infinite(x), 0, x)))
       }
       
-      if (!(jurisdiction %in% c(4, 5)) & (nrow(t) > 0)) {
+      if (!(jurisdiction() %in% c(4, 5)) & (nrow(t) > 0)) {
         # footer name for county summaries
-        footer_name <- switch(jurisdiction, 
+        footer_name <- switch(jurisdiction(), 
                               "1"= "Region", 
                               "2" = "Unincorporated Region",
                               "3" = "Incorporated Region"
@@ -119,13 +119,13 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
       cities_note <- "Circles denote cities that rank in the top ten of filtered results with
       hue progressing from dark to light when sorted in decending order for a given year."
 
-      crit_a <- any(as.integer(year) > 2020) & (attribute != "Total Population")
-      crit_b <- all(as.integer(year) > 2020) & (attribute != "Total Population")
+      crit_a <- any(as.integer(year()) > 2020) & (attribute() != "Total Population")
+      crit_b <- all(as.integer(year()) > 2020) & (attribute() != "Total Population")
 
       disp_note_div <- div(p(display_note, class = "note"), class = "note-container")
       city_note_div <- p(cities_note, class = "long-note")
 
-      if (jurisdiction == 4) {
+      if (jurisdiction() == 4) {
 
         if (crit_b) {
           disp_note_div
@@ -163,7 +163,7 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
 
       cols <- str_subset(colnames(t), "\\d{4}")
 
-      if (report_type %in% c("Delta", "Delta Percent")) {
+      if (report_type() %in% c("Delta", "Delta Percent")) {
         # # re-name column headers
         new_cols_name <- create_annual_delta_headers(t)
         t <- t %>% rename(!!!new_cols_name)
@@ -171,9 +171,9 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
       }
 
       # change numeric formatting or cell style depending on selection
-      if (jurisdiction == 4) {
+      if (jurisdiction() == 4) {
 
-        if (report_type == "Delta Percent") {
+        if (report_type() == "Delta Percent") {
           def_col_form <- rt_default_col_def(t, "percent", add_style_top_ten = T)
         } else {
           def_col_form <- rt_default_col_def(t, "number", add_style_top_ten = T)
@@ -181,7 +181,7 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
 
       } else {
 
-        if (report_type == "Delta Percent") {
+        if (report_type() == "Delta Percent") {
           def_col_form <- rt_default_col_def(t, "percent")
         } else {
           def_col_form <- rt_default_col_def(t, "number")
@@ -189,7 +189,7 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
 
       }
 
-      if (report_type != "Total" & (ncol(t) > 3)) {
+      if (report_type() != "Total" & (ncol(t) > 3)) {
         # remove base column used for calculating change
         t <- t %>% select(everything(), -c(3))
         cols <- cols[2:length(cols)]

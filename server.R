@@ -16,11 +16,11 @@ server <- function(input, output, session) {
   })
   
   table_server(id = "tbl", 
-               year = input$`sidebar-year`, 
-               attribute = input$`sidebar-attr`, 
-               jurisdiction = input$`sidebar-juris`, 
-               county = input$`sidebar-county`, 
-               report_type = input$`sidebar-report_type`, 
-               city_combine = input$`sidebar-city_combine`)
+               year = reactive(input$`sidebar-year`), 
+               attribute = reactive(input$`sidebar-attr`), 
+               jurisdiction = reactive(input$`sidebar-juris`), 
+               county = reactive(input$`sidebar-county`), 
+               report_type = reactive(input$`sidebar-report_type`), 
+               city_combine = reactive(input$`sidebar-city_combine`))
  
 }
