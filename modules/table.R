@@ -2,8 +2,8 @@ table_ui <- function(id) {
   ns <- NS(id)
   
   tagList(
-    column(width = 9,
-           uiOutput(ns("ui_table"))
+      column(width = 12,
+             uiOutput(ns("ui_table"))
     )
   )
   
@@ -51,24 +51,18 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
       }
       
       if (!is.null(county())) {
-        # filter by county, accounting for cities that are multi-county
+        # filter by counties selected, accounting for cities that are multi-county
+        cnty_filter <- county()
         
-        if (county() != "Kitsap") {
-          
-          if (county() %in% "King") {
-            cnty_filter <- c("King", "King-Pierce", "King-Snohomish")
-          } else if (county() == "Pierce") {
-            cnty_filter <- c("Pierce", "King-Pierce")
-          } else if (county() == "Snohomish") {
-            cnty_filter <- c("Snohomish", "King-Snohomish")
-          }
-          d <- d %>% filter(County %in% cnty_filter)
-          
-        } else {
-          
-          d <- d %>% filter(County %in% county())
-          
-        }
+        alt_names <- list(King = c("King", "King-Pierce", "King-Snohomish"),
+                          Pierce = c("Pierce", "King-Pierce"),
+                          Snohomish = c("Snohomish", "King-Snohomish"),
+                          Kitsap = "Kitsap")
+        
+        all_alt_names <- alt_names[cnty_filter] |> unlist()
+        
+        d <- d %>% filter(County %in% all_alt_names)
+        
       }
       
       # calculate change if necessary and pivot data
@@ -197,6 +191,7 @@ table_server <- function(id, year, attribute, jurisdiction, county, report_type,
 
       if (nrow(t) > 0) {
         reactable(t,
+                  resizable = TRUE,
                   searchable = T,
                   showSortable = T,
                   defaultSortOrder = "desc",
